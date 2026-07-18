@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meta Ads Campaign Audit</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Meta Ads Campaign Audit</h1>
+    <p class="subtitle">Pull campaign performance insights from the Meta Marketing API for a client audit.</p>
+
+    <form id="auditForm">
+      <fieldset>
+        <legend>1. Select account</legend>
+
+        <div class="radio-row">
+          <label><input type="radio" name="accountMode" value="dropdown" checked /> Choose from list</label>
+          <label><input type="radio" name="accountMode" value="id" /> Enter account ID</label>
+        </div>
+
+        <div class="field-row" id="dropdownRow">
+          <label for="accountSelect">Account</label>
+          <select id="accountSelect">
+            <option value="AquaTru">AquaTru</option>
+            <option value="Liquid Plus">Liquid Plus</option>
+          </select>
+        </div>
+
+        <div class="field-row" id="accountIdRow" style="display:none">
+          <label for="accountIdInput">Account ID</label>
+          <input type="text" id="accountIdInput" placeholder="e.g. 394785634609611" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. Date ranges</legend>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="fillDefaultDates" />
+          Fill in default dates
+        </label>
+
+        <div class="field-row">
+          <label>Month range (Month 1 &ndash; N)</label>
+          <div class="date-pair">
+            <input type="date" id="monthRangeStart" required />
+            <span>to</span>
+            <input type="date" id="monthRangeEnd" required />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>Current period</label>
+          <div class="date-pair">
+            <input type="date" id="currentPeriodStart" required />
+            <span>to</span>
+            <input type="date" id="currentPeriodEnd" required />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>Comparison period</label>
+          <div class="date-pair">
+            <input type="date" id="comparisonPeriodStart" required />
+            <span>to</span>
+            <input type="date" id="comparisonPeriodEnd" required />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>3. Thresholds</legend>
+        <div class="field-row">
+          <label for="spendThreshold">Spend threshold ($)</label>
+          <input type="number" id="spendThreshold" min="0" step="1" value="300" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>4. Audit context</legend>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="fillExampleContext" />
+          Example context
+        </label>
+
+        <div class="field-row">
+          <label for="primaryObjective">Primary objective</label>
+          <textarea id="primaryObjective" rows="2"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="productFocus">Product focus</label>
+          <textarea id="productFocus" rows="2"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="challengeThemes">Challenge themes</label>
+          <textarea id="challengeThemes" rows="2"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="clientPainPoints">Client pain points</label>
+          <textarea id="clientPainPoints" rows="2"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="additionalContext">Additional context</label>
+          <textarea id="additionalContext" rows="2"></textarea>
+        </div>
+      </fieldset>
+
+      <button type="submit" id="submitBtn">Run audit</button>
+    </form>
+
+    <div id="status" class="status"></div>
+    <pre id="output" class="output"></pre>
+  </main>
+
+  <script src="bundle.js"></script>
+</body>
+</html>

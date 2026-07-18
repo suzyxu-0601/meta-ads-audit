@@ -1,0 +1,24 @@
+{
+  "name": "meta-ads-audit",
+  "version": "1.0.0",
+  "description": "Simple app to pull Meta (Facebook) Ads campaign performance insights for account audits",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:client": "esbuild src/client.ts --bundle --outfile=public/bundle.js --format=iife",
+    "dev": "npm run build:client && tsx watch src/server.ts",
+    "start": "npm run build:client && tsx src/server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^24.0.0",
+    "esbuild": "^0.23.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0"
+  }
+}
