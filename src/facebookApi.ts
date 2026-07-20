@@ -37,8 +37,8 @@ function pickPurchaseValue(entries: ActionEntry[] | undefined): string | null {
   return null;
 }
 
-function simplifyCampaignRow(row: any): CampaignInsightRow {
-  return {
+function simplifyCampaignRow(row: any, opts: { includeDates?: boolean } = {}): CampaignInsightRow {
+  const simplified: CampaignInsightRow = {
     campaign_id: row.campaign_id,
     campaign_name: row.campaign_name,
     spend: row.spend,
@@ -50,6 +50,17 @@ function simplifyCampaignRow(row: any): CampaignInsightRow {
     purchase_roas: pickPurchaseValue(row.purchase_roas),
     cost_per_purchase: pickPurchaseValue(row.cost_per_action_type),
   };
+
+  // Only carry date_start/date_stop on rows where they vary (e.g. the monthly
+  // trend, one bucket per month). On a single time_range call every row shares
+  // the same dates, which are already captured once in the response's
+  // top-level filters block.
+  if (opts.includeDates) {
+    simplified.date_start = row.date_start;
+    simplified.date_stop = row.date_stop;
+  }
+
+  return simplified;
 }
 
 interface DateRange {
@@ -87,7 +98,10 @@ function buildInsightsUrl(
   return `${GRAPH_API_BASE}/${adAccountId}/insights?${params.toString()}`;
 }
 
-async function fetchInsights(url: string): Promise<CampaignInsightRow[]> {
+async function fetchInsights(
+  url: string,
+  opts: { includeDates?: boolean } = {}
+): Promise<CampaignInsightRow[]> {
   const res = await fetch(url);
   const body = await res.json();
 
@@ -98,7 +112,7 @@ async function fetchInsights(url: string): Promise<CampaignInsightRow[]> {
   }
 
   const rows: any[] = (body as any).data ?? [];
-  return rows.map(simplifyCampaignRow);
+  return rows.map((row) => simplifyCampaignRow(row, opts));
 }
 
 export async function runCampaignAudit(
@@ -129,7 +143,7 @@ export async function runCampaignAudit(
   );
 
   const [monthlyTrend, current, comparison] = await Promise.all([
-    fetchInsights(monthlyTrendUrl),
+    fetchInsights(monthlyTrendUrl, { includeDates: true }),
     fetchInsights(currentPeriodUrl),
     fetchInsights(comparisonPeriodUrl),
   ]);

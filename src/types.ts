@@ -25,6 +25,9 @@ export interface CampaignInsightRow {
   purchases: string | null;
   purchase_roas: string | null;
   cost_per_purchase: string | null;
+  // Only present on monthlyTrend rows, where each row is a different month.
+  date_start?: string;
+  date_stop?: string;
 }
 
 export interface AuditResponse {
