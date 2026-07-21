@@ -322,10 +322,21 @@ button:disabled {
   flex-direction: column;
 }
 
+.slide-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75em;
+}
+
 .slide-card .slide-title {
   font-size: 1.3em;
   font-weight: 700;
   color: #fff;
+}
+
+.slide-card .slide-period {
+  font-size: 0.8em;
+  color: #c9cdd6;
 }
 
 .slide-card .slide-subtitle {
@@ -337,7 +348,7 @@ button:disabled {
 
 .slide-card .slide-logo {
   position: absolute;
-  bottom: 3%;
+  top: 3%;
   right: 3%;
   width: 6%;
   opacity: 0.9;
@@ -418,31 +429,55 @@ button:disabled {
   min-height: 0;
 }
 
-.theme-card {
+.theme-col {
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #0163c3;
-  border-radius: 8px;
-  padding: 0.7em;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2%;
   min-width: 0;
 }
 
-.theme-card h4 {
-  margin: 0 0 0.4em;
+.theme-col h4 {
+  margin: 0;
+  color: #f86120;
+  flex: 0 0 auto;
+}
+
+.theme-box {
+  flex: 1;
+  border-radius: 8px;
+  padding: 0.6em;
+  overflow-y: auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.theme-box-challenge {
+  background: #fce9d7;
+  border: 1px solid #f86120;
+}
+
+.theme-box-solution {
+  background: #dcebfb;
+  border: 1px solid #0163c3;
+}
+
+.field-label {
+  font-weight: 700;
+  font-size: 0.85em;
+}
+
+.field-label-orange {
   color: #f86120;
 }
 
-.theme-card .field-label {
+.field-label-blue {
   color: #0163c3;
-  font-weight: 700;
-  font-size: 0.85em;
-  margin-top: 0.5em;
 }
 
-.theme-card p {
+.theme-box p {
   margin: 0.2em 0 0;
-  color: #c9cdd6;
+  color: #14172b;
 }
 
 .preview-table {
@@ -470,4 +505,184 @@ button:disabled {
 .preview-table th:first-child {
   color: #4f9dff;
   font-weight: 600;
+}
+
+.channel-name {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.05em;
+}
+
+.channel-detail {
+  color: #c9cdd6;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.platform-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.85em;
+  margin-right: 0.4em;
+  vertical-align: middle;
+}
+
+.status-badge {
+  display: inline-block;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.75em;
+  padding: 0.15em 0.55em;
+  border-radius: 999px;
+  margin-bottom: 0.3em;
+  white-space: nowrap;
+}
+
+.status-active {
+  background: #1e8e3e;
+}
+
+.status-launch {
+  background: #d32f2f;
+}
+
+/* ---------- 3-Month Outlook: chevron/pentagon process headers ---------- */
+
+.chevron-row {
+  display: flex;
+  gap: 2%;
+  margin: 3% 0 2%;
+}
+
+.chevron {
+  flex: 1;
+  clip-path: polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%);
+  padding: 0.5em 1.6em 0.5em 0.7em;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85em;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.chevron-blue {
+  background: #0163c3;
+}
+
+.chevron-orange {
+  background: #f86120;
+}
+
+.month-columns {
+  display: flex;
+  gap: 2%;
+  flex: 1;
+  min-height: 0;
+}
+
+.month-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.month-field p {
+  margin: 0.15em 0 0;
+  color: #c9cdd6;
+}
+
+/* ---------- Proposed Campaign Architecture: tag chips + stat callouts ---------- */
+
+.arch-columns {
+  display: flex;
+  gap: 2%;
+  flex: 1;
+  margin-top: 3%;
+  min-height: 0;
+}
+
+.arch-col {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #0163c3;
+  border-radius: 8px;
+  padding: 0.6em;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.arch-col h4 {
+  margin: 0 0 0.3em;
+  color: #f86120;
+}
+
+.arch-col p {
+  margin: 0.15em 0 0.3em;
+  color: #c9cdd6;
+}
+
+.arch-stat {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #fff;
+}
+
+.arch-stat-label {
+  font-size: 0.7em;
+  color: #c9cdd6;
+  margin-bottom: 0.4em;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em;
+  margin: 0.2em 0 0.5em;
+}
+
+.tag-chip {
+  background: #dcebfb;
+  color: #14172b;
+  border-radius: 999px;
+  padding: 0.1em 0.6em;
+  font-size: 0.8em;
+  text-align: left;
+}
+
+.cpa-roas-row {
+  display: flex;
+  gap: 0.5em;
+  margin-top: 0.4em;
+}
+
+.cpa-roas-row > div {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-value {
+  font-weight: 700;
+  font-size: 1.05em;
+}
+
+.stat-orange {
+  color: #f86120;
+}
+
+.stat-blue {
+  color: #0163c3;
+}
+
+.stat-label {
+  font-size: 0.7em;
+  color: #c9cdd6;
 }

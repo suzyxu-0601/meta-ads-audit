@@ -98,6 +98,8 @@ export interface GeneratedSlide {
   title: string;
   content: SlideContent;
   chartPaths?: { spend: string; roasCpa: string; cpmFreq: string };
+  /** Only set on performance-overview — the overall audit date range, shown beside the title. */
+  auditPeriod?: { since: string; until: string };
 }
 
 /** Same as GeneratedSlide but with chart images inlined as data URIs for the browser preview. */
@@ -106,6 +108,7 @@ export interface PublicGeneratedSlide {
   title: string;
   content: SlideContent;
   chartDataUrls?: { spend: string; roasCpa: string; cpmFreq: string };
+  auditPeriod?: { since: string; until: string };
 }
 
 export interface DeckJobRequest {

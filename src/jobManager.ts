@@ -53,7 +53,7 @@ async function chartToDataUrl(filePath: string): Promise<string> {
 
 async function toPublicSlide(slide: GeneratedSlide): Promise<PublicGeneratedSlide> {
   if (!slide.chartPaths) {
-    return { id: slide.id, title: slide.title, content: slide.content };
+    return { id: slide.id, title: slide.title, content: slide.content, auditPeriod: slide.auditPeriod };
   }
   const [spend, roasCpa, cpmFreq] = await Promise.all([
     chartToDataUrl(slide.chartPaths.spend),
@@ -65,6 +65,7 @@ async function toPublicSlide(slide: GeneratedSlide): Promise<PublicGeneratedSlid
     title: slide.title,
     content: slide.content,
     chartDataUrls: { spend, roasCpa, cpmFreq },
+    auditPeriod: slide.auditPeriod,
   };
 }
 
@@ -169,6 +170,7 @@ async function runJob(job: Job): Promise<void> {
       title: slideDef.title,
       content,
       chartPaths: slideDef.id === "performance-overview" ? chartPaths : undefined,
+      auditPeriod: slideDef.id === "performance-overview" ? job.insights.filters.monthRange : undefined,
     };
     slides.push(generatedSlide);
     completed++;

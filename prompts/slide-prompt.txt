@@ -5,10 +5,10 @@ Later for PPTX buid:
 - Use the GR0 brand skill (/gr0branded)
 - Dark background: Midnight Blue #0F142A
 - Accent colors: GR0 Blue #0163C3 and GR0 Orange #F86120
-- White logo from brand assets (in /assets)
+- White logo from brand assets (in /assets), always on the top right corner of each slide
 - Blob arrangement as background texture at 30% transparency
 - All text as editable native PowerPoint text boxes
-- All text size must be at least 12pt 
+- All body text size must be at least 10pt
 - Titles/subtitles must be distinguishable from background color (e.g., no dark text and dark background at the same time)
 - For any charts requiring dual axes: render as matplotlib PNG images embedded in the slide rather than native PowerPoint combo charts — this ensures both series display correctly when opened in PowerPoint
 

@@ -223,6 +223,20 @@ function roasX(n: number): string {
   return `${n.toFixed(2)}x`;
 }
 
+function formatDateClient(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+function formatDateRangeClient(period: { since: string; until: string }): string {
+  return `${formatDateClient(period.since)} – ${formatDateClient(period.until)}`;
+}
+
 function kpiBox(label: string, value: string): string {
   return `<div class="kpi-box"><div class="kpi-value">${escapeHtml(value)}</div><div class="kpi-label">${escapeHtml(
     label
@@ -231,6 +245,30 @@ function kpiBox(label: string, value: string): string {
 
 function li(text: string): string {
   return `<li>${escapeHtml(text)}</li>`;
+}
+
+// Mirrors the server-side safety net in deckBuilder.ts: Claude is asked for a
+// bare number but this trims any justification clause it adds anyway.
+function shortStat(value: string, maxLen = 14): string {
+  const trimmed = value.trim();
+  const cutIdx = trimmed.search(/[;,(]| - | at | as | to /i);
+  const short = cutIdx > 0 ? trimmed.slice(0, cutIdx).trim() : trimmed;
+  return short.length > maxLen ? `${short.slice(0, maxLen - 1)}…` : short;
+}
+
+// Same reasoning as the server-side deckBuilder: no legitimate source for
+// official third-party platform logos, and the channels vary per run, so
+// this is a monogram circle rather than a real brand mark — kept a single
+// consistent blue rather than per-platform colors.
+function platformIconHtml(name: string): string {
+  return `<span class="platform-icon" style="background:#0163C3;color:#ffffff">${escapeHtml(
+    name.trim().charAt(0).toUpperCase()
+  )}</span>`;
+}
+
+function statusBadgeHtml(status: string): string {
+  if (status !== "active" && status !== "launch") return "";
+  return `<span class="status-badge status-${status}">${status.toUpperCase()}</span>`;
 }
 
 function renderSlideBody(slide: PublicGeneratedSlide): string {
@@ -262,50 +300,69 @@ function renderSlideBody(slide: PublicGeneratedSlide): string {
       const content = slide.content as ChallengesSolutionsContent;
       return `<div class="column-row">${content.columns
         .map(
-          (col) => `<div class="theme-card">
+          (col) => `<div class="theme-col">
             <h4>${escapeHtml(col.theme)}</h4>
-            <div class="field-label">CHALLENGE</div><p>${escapeHtml(col.challenge)}</p>
-            <div class="field-label">SOLUTION</div><p>${escapeHtml(col.solution)}</p>
+            <div class="theme-box theme-box-challenge">
+              <div class="field-label field-label-orange">CHALLENGE</div>
+              <p>${escapeHtml(col.challenge)}</p>
+            </div>
+            <div class="theme-box theme-box-solution">
+              <div class="field-label field-label-blue">SOLUTION</div>
+              <p>${escapeHtml(col.solution)}</p>
+            </div>
           </div>`
         )
         .join("")}</div>`;
     }
     case "three-month-outlook": {
       const content = slide.content as ThreeMonthOutlookContent;
+      const months = content.months.slice(0, 3);
+      const chevronClass = (i: number) => (i === 2 ? "chevron-orange" : "chevron-blue");
+      const fields: [string, (m: ThreeMonthOutlookContent["months"][number]) => string][] = [
+        ["Campaign Structure", (m) => m.campaignChanges],
+        ["Creative Testing", (m) => m.creativeTesting],
+        ["Channel Expansion", (m) => m.channelExpansion],
+        ["KPI Targets", (m) => m.kpiTargets],
+      ];
       return `<div class="slide-subtitle">North star: ${escapeHtml(content.northStar)}</div>
-        <table class="preview-table">
-          <thead><tr><th>Month</th><th>Campaign Structure</th><th>Creative Testing</th><th>Channel Expansion</th><th>KPI Targets</th></tr></thead>
-          <tbody>${content.months
-            .map(
-              (m) =>
-                `<tr><td>${escapeHtml(m.title)}</td><td>${escapeHtml(m.campaignChanges)}</td><td>${escapeHtml(
-                  m.creativeTesting
-                )}</td><td>${escapeHtml(m.channelExpansion)}</td><td>${escapeHtml(m.kpiTargets)}</td></tr>`
-            )
-            .join("")}</tbody>
-        </table>`;
+        <div class="chevron-row">${months
+          .map((m, i) => `<div class="chevron ${chevronClass(i)}"><span>${escapeHtml(m.title)}</span></div>`)
+          .join("")}</div>
+        <div class="month-columns">${months
+          .map(
+            (m) => `<div class="month-col">${fields
+              .map(
+                ([label, getValue]) =>
+                  `<div class="month-field"><span class="field-label field-label-blue">${label}</span><p>${escapeHtml(
+                    getValue(m)
+                  )}</p></div>`
+              )
+              .join("")}</div>`
+          )
+          .join("")}</div>`;
     }
     case "campaign-architecture": {
       const content = slide.content as CampaignArchitectureContent;
-      const fields: [string, (s: CampaignArchitectureContent["stages"][number]) => string][] = [
-        ["Budget Split", (s) => `${s.budgetSplitPct}%`],
-        ["Campaigns", (s) => s.campaignNames.join(", ")],
-        ["Targeting", (s) => s.targeting],
-        ["Creative Types", (s) => s.creativeTypes],
-        ["CPA Target", (s) => s.cpaTarget],
-        ["ROAS Target", (s) => s.roasTarget],
-      ];
-      return `<table class="preview-table">
-        <thead><tr><th></th>${content.stages.map((s) => `<th>${escapeHtml(s.stage)}</th>`).join("")}</tr></thead>
-        <tbody>${fields
-          .map(
-            ([label, getValue]) =>
-              `<tr><td>${label}</td>${content.stages
-                .map((s) => `<td>${escapeHtml(getValue(s))}</td>`)
-                .join("")}</tr>`
-          )
-          .join("")}</tbody>
-      </table>`;
+      return `<div class="arch-columns">${content.stages
+        .slice(0, 3)
+        .map(
+          (st) => `<div class="arch-col">
+            <h4>${escapeHtml(st.stage)}</h4>
+            <div class="arch-stat">${st.budgetSplitPct}%</div>
+            <div class="arch-stat-label">BUDGET SPLIT</div>
+            <div class="field-label field-label-blue">CAMPAIGNS</div>
+            <div class="tag-row">${st.campaignNames.slice(0, 2).map((n) => `<span class="tag-chip">${escapeHtml(n)}</span>`).join("")}</div>
+            <div class="field-label field-label-blue">TARGETING</div>
+            <p>${escapeHtml(st.targeting)}</p>
+            <div class="field-label field-label-blue">CREATIVE TYPES</div>
+            <p>${escapeHtml(st.creativeTypes)}</p>
+            <div class="cpa-roas-row">
+              <div><div class="stat-value stat-orange">${escapeHtml(shortStat(st.cpaTarget))}</div><div class="stat-label">CPA TARGET</div></div>
+              <div><div class="stat-value stat-blue">${escapeHtml(shortStat(st.roasTarget))}</div><div class="stat-label">ROAS TARGET</div></div>
+            </div>
+          </div>`
+        )
+        .join("")}</div>`;
     }
     case "creative-testing-roadmap": {
       const content = slide.content as CreativeRoadmapContent;
@@ -325,18 +382,23 @@ function renderSlideBody(slide: PublicGeneratedSlide): string {
     }
     case "channel-expansion-roadmap": {
       const content = slide.content as ChannelRoadmapContent;
-      return `<table class="preview-table">
+      const monthCell = (m: ChannelRoadmapContent["channels"][number]["month1"]) =>
+        `${statusBadgeHtml(m.status)}<div>${escapeHtml(m.actions)}</div>`;
+      return `<table class="preview-table channel-table">
         <thead><tr><th>Channel</th><th>Month 1</th><th>Month 2</th><th>Month 3</th></tr></thead>
         <tbody>${content.channels
+          .slice(0, 3)
           .map(
             (ch) =>
-              `<tr><td>${escapeHtml(ch.name)}<br><small>${escapeHtml(ch.budgetRange)} · ${escapeHtml(
+              `<tr><td>${platformIconHtml(ch.name)}<span class="channel-name">${escapeHtml(
+                ch.name
+              )}</span><br><span class="channel-detail">${escapeHtml(ch.budgetRange)} · ${escapeHtml(
+                ch.creativeFormats
+              )} · ${escapeHtml(ch.targetingApproach)} · ${escapeHtml(
                 ch.campaignType
-              )}</small></td><td>[${ch.month1.status.toUpperCase()}] ${escapeHtml(
-                ch.month1.actions
-              )}</td><td>[${ch.month2.status.toUpperCase()}] ${escapeHtml(
-                ch.month2.actions
-              )}</td><td>[${ch.month3.status.toUpperCase()}] ${escapeHtml(ch.month3.actions)}</td></tr>`
+              )}</span></td><td>${monthCell(ch.month1)}</td><td>${monthCell(
+                ch.month2
+              )}</td><td>${monthCell(ch.month3)}</td></tr>`
           )
           .join("")}</tbody>
       </table>`;
@@ -347,8 +409,15 @@ function renderSlideBody(slide: PublicGeneratedSlide): string {
 }
 
 function renderSlideCard(slide: PublicGeneratedSlide): string {
+  const periodHtml =
+    slide.id === "performance-overview" && slide.auditPeriod
+      ? `<span class="slide-period">${escapeHtml(formatDateRangeClient(slide.auditPeriod))}</span>`
+      : "";
   return `<div class="slide-card" style="background-image:url('/assets/Arrangement-Dark-1.png')">
-    <div class="slide-title">${escapeHtml(slide.title)}</div>
+    <div class="slide-title-row">
+      <div class="slide-title">${escapeHtml(slide.title)}</div>
+      ${periodHtml}
+    </div>
     ${renderSlideBody(slide)}
     <img class="slide-logo" src="/assets/GR0_Logo_white.png" alt="GR0" />
   </div>`;

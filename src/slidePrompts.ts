@@ -65,14 +65,18 @@ For each month include: campaign structure changes specific to this account, cre
     id: "campaign-architecture",
     title: "Proposed Campaign Architecture",
     instructions: `Propose a three-stage campaign architecture: Prospecting, Retargeting, Retention.
-For each stage give: budget split percentage (all three must sum to 100), specific campaign names to use,
-targeting inclusions/exclusions, creative types, and KPI targets (CPA and ROAS) grounded in the account's
-own best-performing campaigns from the data below.`,
+For each stage give: budget split percentage (all three must sum to 100), at most 2 specific campaign
+names to use (pick the 2 most important — don't list more, they won't all be shown), targeting
+inclusions/exclusions, creative types, and KPI targets (CPA and ROAS) grounded in the account's own
+best-performing campaigns from the data below.
+cpaTarget and roasTarget must be a bare number ONLY (e.g. "$110" or "$75-130", "3.0x" or "2.5-3.0x") —
+no extra words, parentheticals, or justification sentences. Put any reasoning about the target in the
+targeting or creativeTypes field instead, never appended to the number itself.`,
     responseSchema: `{
   "stages": [
-    { "stage": "Prospecting", "budgetSplitPct": 0, "campaignNames": ["..."], "targeting": "...", "creativeTypes": "...", "cpaTarget": "...", "roasTarget": "..." },
-    { "stage": "Retargeting", "budgetSplitPct": 0, "campaignNames": ["..."], "targeting": "...", "creativeTypes": "...", "cpaTarget": "...", "roasTarget": "..." },
-    { "stage": "Retention", "budgetSplitPct": 0, "campaignNames": ["..."], "targeting": "...", "creativeTypes": "...", "cpaTarget": "...", "roasTarget": "..." }
+    { "stage": "Prospecting", "budgetSplitPct": 0, "campaignNames": ["...", "..."] // max 2, "targeting": "...", "creativeTypes": "...", "cpaTarget": "$0", "roasTarget": "0x" },
+    { "stage": "Retargeting", "budgetSplitPct": 0, "campaignNames": ["...", "..."] // max 2, "targeting": "...", "creativeTypes": "...", "cpaTarget": "$0", "roasTarget": "0x" },
+    { "stage": "Retention", "budgetSplitPct": 0, "campaignNames": ["...", "..."] // max 2, "targeting": "...", "creativeTypes": "...", "cpaTarget": "$0", "roasTarget": "0x" }
   ]
 }`,
   },
@@ -97,7 +101,10 @@ account's current CPA benchmarks from the data below.`,
     instructions: `Build a channel expansion timeline across Meta plus two new channels (use channels mentioned in the
 client's additional context if any are named there, otherwise propose two appropriate for this account).
 For each channel give Month 1/2/3 actions and a status per month (active, planning, or launch), a budget
-test range, creative formats, targeting approach, and campaign type.`,
+test range, creative formats, targeting approach, and campaign type.
+budgetRange, creativeFormats, targetingApproach, and campaignType are each shown as a short caption under
+the platform name — keep each one to 2-4 words (e.g. "$5k-10k", "Short-form video", "Interest-based",
+"Consideration"), not a full sentence.`,
     responseSchema: `{
   "channels": [
     { "name": "Meta", "month1": { "status": "active", "actions": "..." }, "month2": { "status": "active", "actions": "..." }, "month3": { "status": "active", "actions": "..." }, "budgetRange": "...", "creativeFormats": "...", "targetingApproach": "...", "campaignType": "..." },
