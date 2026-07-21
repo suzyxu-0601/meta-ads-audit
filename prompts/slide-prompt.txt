@@ -1,0 +1,65 @@
+Slide Structure 
+System prompt: Use user inputs (primary objective, product focus, challenge themes, client pain points, additional context) as context when necessary. 
+
+Later for PPTX buid:
+- Use the GR0 brand skill (/gr0branded)
+- Dark background: Midnight Blue #0F142A
+- Accent colors: GR0 Blue #0163C3 and GR0 Orange #F86120
+- White logo from brand assets (in /assets)
+- Blob arrangement as background texture at 30% transparency
+- All text as editable native PowerPoint text boxes
+- All text size must be at least 12pt 
+- Titles/subtitles must be distinguishable from background color (e.g., no dark text and dark background at the same time)
+- For any charts requiring dual axes: render as matplotlib PNG images embedded in the slide rather than native PowerPoint combo charts — this ensures both series display correctly when opened in PowerPoint
+
+
+Slide 1: Performance Overview 
+(Data from Meta API used) 
+Prompt: 
+Generate a performance overview slide. 
+- KPI summary strip with 5 headline numbers: total spend, peak ROAS (and month), current ROAS, CPM change (first to last month), CPA change (first to last month)
+- Three graphs (use matplotlib to generate png images) highlight lines/bars if needed 1. spend per month (bar charts, show axis on the left, don’t label individual bars) 2. line graph with dual axes showing ROAS and CPA 3. line graph with dual axes showing cpm and frequency
+- 3 insight bullets grounded in the data trends
+- 3 recommendation bullets that directly address the trends
+
+Reference actual numbers, months, and campaign types — no generic copy.
+
+Slide 2: Challenges & Solutions 
+Based on the audit findings for the client, write content for a GR0 Challenges & Solutions slide with three columns.
+
+Column 1 — [CHALLENGE THEME, e.g. 'Limited Audience Structure']
+Column 2 — [CHALLENGE THEME, e.g. 'Inconsistent Performance']
+Column 3 — [CHALLENGE THEME, e.g. 'Creative Blackhole']
+
+For each column write:
+- Challenge: 2-3 sentences grounded in specific account data (spend, ROAS, CPM, dates). No generic agency language.
+- Solution: 2-3 sentences that are specific and actionable. Name the campaigns, formats, or audiences involved.
+
+Challenges should reflect what we found. Solutions should preview what we do in the first 30-60 days.
+
+Slide 3: Three-Month Outlook 
+Based on the full audit for the client, build a 3-month paid social outlook. The north star objective is [PRIMARY OBJECTIVE].
+
+Structure:
+- Month 1: Audit, Structure & Foundation
+- Month 2: Creative Testing & Channel Expansion
+- Month 3: Scale & New Channel Launch (propose [CHANNEL 2] + [CHANNEL 3], e.g., Pinterest, Reddit)
+
+For each month include:
+- Campaign structure changes specific to this account
+- Creative testing priorities based on what the data showed
+- Channel expansion steps and rationale
+- KPI targets anchored to the account's own best-performing months — not industry benchmarks
+
+Client context to incorporate:
+- Primary pain points: [LIST PAIN POINTS FROM CLIENT CALL]
+- Products to prioritize: [PRODUCT LINE WITH BIGGEST GAP]
+
+Slide 4: Proposed Campaign Architecture 
+Three-column prospecting / retargeting / retention breakdown showing: budget split %, specific campaign names, targeting inclusions/exclusions, creative types, and KPI targets (CPA and ROAS) per stage.
+
+Slide 5: Creative Testing Roadmap 
+Persona x hook x angle x format matrix for [PRODUCT FOCUS] showing: 3 personas, 3 hook variants per persona (written as actual hook copy), angle, format, creator assignment, and target CPA/thumbstop per persona.
+
+Slide 6: Channel Expansion Roadmap 
+Timeline grid across [CHANNEL 1: Meta] + [CHANNEL 2] + [CHANNEL 3] showing Month 1 / 2 / 3 actions per channel with active vs. planning vs. launch status. Include budget test ranges, creative formats, targeting approach, and campaign type for each launch channel.

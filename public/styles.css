@@ -2,12 +2,39 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: #0f1115;
   color: #e6e6e6;
   margin: 0;
+}
+
+.workspace {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100vh;
+  gap: 0;
+}
+
+.menu-pane {
+  flex: 1 1 100%;
+  min-width: 0;
   padding: 2rem 1rem;
+  transition: flex-basis 0.35s ease;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+.workspace.generating .menu-pane {
+  flex: 0 0 30%;
+}
+
+.workspace.generating .deck-pane {
+  flex: 0 0 70%;
 }
 
 .container {
@@ -137,4 +164,310 @@ button:disabled {
   line-height: 1.4;
   max-height: 60vh;
   overflow: auto;
+}
+
+.json-status {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #9a9fa8;
+}
+
+.show-more-link {
+  color: #4f7cff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---------- Deck generation pane ---------- */
+
+.deck-pane {
+  flex: 0 0 0%;
+  min-width: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0b0d12;
+  border-left: 1px solid #2a2d35;
+  overflow: hidden;
+}
+
+.deck-topbar {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #2a2d35;
+}
+
+.deck-progress-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.deck-progress-label {
+  font-size: 0.85rem;
+  color: #cfd3da;
+  margin-bottom: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress-track {
+  background: #1a1d24;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #0163c3, #f86120);
+  height: 100%;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+.deck-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #6b6f78;
+}
+
+.log-toggle {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+  font-size: 0.8rem;
+  color: #9a9fa8;
+  white-space: nowrap;
+}
+
+.discontinue-btn {
+  flex: 0 0 auto;
+  width: auto;
+  background: #3a1f22;
+  color: #ff9d9d;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.85rem;
+}
+
+.discontinue-btn:hover {
+  background: #4a262a;
+}
+
+.deck-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.log-panel {
+  flex: 0 1 auto;
+  max-height: 32%;
+  overflow-y: auto;
+  background: #08090c;
+  color: #7ee787;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid #2a2d35;
+}
+
+.slide-preview {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.deck-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #2a2d35;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.download-btn {
+  width: auto;
+  background: #0163c3;
+  padding: 0.7rem 1.75rem;
+}
+
+.download-btn:hover:not(:disabled) {
+  background: #0177e6;
+}
+
+/* ---------- Slide preview cards ---------- */
+
+.slide-card {
+  position: relative;
+  flex: 0 0 auto;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0f142a center / cover no-repeat;
+  border: 1px solid #2a2d35;
+  padding: 3% 3.5%;
+  color: #e6e6e6;
+  font-size: 0.7rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.slide-card .slide-title {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #fff;
+}
+
+.slide-card .slide-subtitle {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #f86120;
+  margin-top: 0.2em;
+}
+
+.slide-card .slide-logo {
+  position: absolute;
+  bottom: 3%;
+  right: 3%;
+  width: 6%;
+  opacity: 0.9;
+}
+
+.kpi-strip {
+  display: flex;
+  gap: 2%;
+  margin: 3% 0 2%;
+}
+
+.kpi-box {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #0163c3;
+  border-radius: 6px;
+  padding: 0.5em;
+  text-align: center;
+}
+
+.kpi-box .kpi-value {
+  font-weight: 700;
+  color: #f86120;
+  font-size: 1.05em;
+}
+
+.kpi-box .kpi-label {
+  color: #c9cdd6;
+  font-size: 0.85em;
+  margin-top: 0.2em;
+}
+
+.chart-row {
+  display: flex;
+  gap: 1.5%;
+  flex: 1;
+  min-height: 0;
+}
+
+.chart-row img {
+  flex: 1;
+  width: 0;
+  object-fit: contain;
+}
+
+.bullet-row {
+  display: flex;
+  gap: 3%;
+  margin-top: 2%;
+}
+
+.bullet-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.bullet-col h4 {
+  margin: 0 0 0.3em;
+  color: #f86120;
+  font-size: 1em;
+}
+
+.bullet-col ul {
+  margin: 0;
+  padding-left: 1.1em;
+  color: #c9cdd6;
+}
+
+.bullet-col li {
+  margin-bottom: 0.3em;
+}
+
+.column-row {
+  display: flex;
+  gap: 2%;
+  flex: 1;
+  margin-top: 3%;
+  min-height: 0;
+}
+
+.theme-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #0163c3;
+  border-radius: 8px;
+  padding: 0.7em;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.theme-card h4 {
+  margin: 0 0 0.4em;
+  color: #f86120;
+}
+
+.theme-card .field-label {
+  color: #0163c3;
+  font-weight: 700;
+  font-size: 0.85em;
+  margin-top: 0.5em;
+}
+
+.theme-card p {
+  margin: 0.2em 0 0;
+  color: #c9cdd6;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2%;
+  font-size: 0.85em;
+}
+
+.preview-table th,
+.preview-table td {
+  border: 1px solid #0163c3;
+  padding: 0.4em 0.5em;
+  vertical-align: top;
+  text-align: left;
+  color: #c9cdd6;
+}
+
+.preview-table th {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f86120;
+}
+
+.preview-table td:first-child,
+.preview-table th:first-child {
+  color: #4f9dff;
+  font-weight: 600;
 }

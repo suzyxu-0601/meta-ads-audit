@@ -7,113 +7,149 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>Meta Ads Campaign Audit</h1>
-    <p class="subtitle">Pull campaign performance insights from the Meta Marketing API for a client audit.</p>
+  <div class="workspace" id="workspace">
+    <div class="menu-pane" id="menuPane">
+      <main class="container">
+        <h1>Meta Ads Campaign Audit</h1>
+        <p class="subtitle">Pull campaign performance insights from the Meta Marketing API for a client audit.</p>
 
-    <form id="auditForm">
-      <fieldset>
-        <legend>1. Select account</legend>
+        <form id="auditForm">
+          <fieldset>
+            <legend>1. Select account</legend>
 
-        <div class="radio-row">
-          <label><input type="radio" name="accountMode" value="dropdown" checked /> Choose from list</label>
-          <label><input type="radio" name="accountMode" value="id" /> Enter account ID</label>
+            <div class="radio-row">
+              <label><input type="radio" name="accountMode" value="dropdown" checked /> Choose from list</label>
+              <label><input type="radio" name="accountMode" value="id" /> Enter account ID</label>
+            </div>
+
+            <div class="field-row" id="dropdownRow">
+              <label for="accountSelect">Account</label>
+              <select id="accountSelect">
+                <option value="AquaTru">AquaTru</option>
+                <option value="Liquid Plus">Liquid Plus</option>
+              </select>
+            </div>
+
+            <div class="field-row" id="accountIdRow" style="display:none">
+              <label for="accountIdInput">Account ID</label>
+              <input type="text" id="accountIdInput" placeholder="e.g. 394785634609611" />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>2. Date ranges</legend>
+
+            <label class="checkbox-row">
+              <input type="checkbox" id="fillDefaultDates" />
+              Fill in default dates
+            </label>
+
+            <div class="field-row">
+              <label>Month range (Month 1 &ndash; N)</label>
+              <div class="date-pair">
+                <input type="date" id="monthRangeStart" required />
+                <span>to</span>
+                <input type="date" id="monthRangeEnd" required />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <label>Current period</label>
+              <div class="date-pair">
+                <input type="date" id="currentPeriodStart" required />
+                <span>to</span>
+                <input type="date" id="currentPeriodEnd" required />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <label>Comparison period</label>
+              <div class="date-pair">
+                <input type="date" id="comparisonPeriodStart" required />
+                <span>to</span>
+                <input type="date" id="comparisonPeriodEnd" required />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>3. Thresholds</legend>
+            <div class="field-row">
+              <label for="spendThreshold">Spend threshold ($)</label>
+              <input type="number" id="spendThreshold" min="0" step="1" value="300" />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>4. Audit context</legend>
+
+            <label class="checkbox-row">
+              <input type="checkbox" id="fillExampleContext" />
+              Example context
+            </label>
+
+            <div class="field-row">
+              <label for="primaryObjective">Primary objective</label>
+              <textarea id="primaryObjective" rows="2"></textarea>
+            </div>
+            <div class="field-row">
+              <label for="productFocus">Product focus</label>
+              <textarea id="productFocus" rows="2"></textarea>
+            </div>
+            <div class="field-row">
+              <label for="challengeThemes">Challenge themes</label>
+              <textarea id="challengeThemes" rows="2"></textarea>
+            </div>
+            <div class="field-row">
+              <label for="clientPainPoints">Client pain points</label>
+              <textarea id="clientPainPoints" rows="2"></textarea>
+            </div>
+            <div class="field-row">
+              <label for="additionalContext">Additional context</label>
+              <textarea id="additionalContext" rows="2"></textarea>
+            </div>
+          </fieldset>
+
+          <button type="submit" id="submitBtn">Generate Audit Deck</button>
+        </form>
+
+        <div id="status" class="status"></div>
+        <div id="jsonStatus" class="json-status" hidden>
+          JSON response fetched — <a href="#" id="showMoreLink" class="show-more-link">show more</a>
         </div>
+        <pre id="output" class="output" hidden></pre>
+      </main>
+    </div>
 
-        <div class="field-row" id="dropdownRow">
-          <label for="accountSelect">Account</label>
-          <select id="accountSelect">
-            <option value="AquaTru">AquaTru</option>
-            <option value="Liquid Plus">Liquid Plus</option>
-          </select>
+    <div class="deck-pane" id="deckPane" hidden>
+      <div class="deck-topbar">
+        <div class="deck-progress-wrap">
+          <div class="deck-progress-label" id="progressLabel">Starting…</div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="deck-progress-meta">
+            <span id="progressPercent">0%</span>
+            <span id="elapsedTime">0:00</span>
+          </div>
         </div>
-
-        <div class="field-row" id="accountIdRow" style="display:none">
-          <label for="accountIdInput">Account ID</label>
-          <input type="text" id="accountIdInput" placeholder="e.g. 394785634609611" />
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>2. Date ranges</legend>
-
-        <label class="checkbox-row">
-          <input type="checkbox" id="fillDefaultDates" />
-          Fill in default dates
+        <label class="checkbox-row log-toggle">
+          <input type="checkbox" id="hideLogs" />
+          Hide logging output
         </label>
+        <button type="button" id="discontinueBtn" class="discontinue-btn">Discontinue</button>
+      </div>
 
-        <div class="field-row">
-          <label>Month range (Month 1 &ndash; N)</label>
-          <div class="date-pair">
-            <input type="date" id="monthRangeStart" required />
-            <span>to</span>
-            <input type="date" id="monthRangeEnd" required />
-          </div>
-        </div>
+      <div class="deck-body">
+        <div class="log-panel" id="logPanel"></div>
+        <div class="slide-preview" id="slidePreview"></div>
+      </div>
 
-        <div class="field-row">
-          <label>Current period</label>
-          <div class="date-pair">
-            <input type="date" id="currentPeriodStart" required />
-            <span>to</span>
-            <input type="date" id="currentPeriodEnd" required />
-          </div>
-        </div>
-
-        <div class="field-row">
-          <label>Comparison period</label>
-          <div class="date-pair">
-            <input type="date" id="comparisonPeriodStart" required />
-            <span>to</span>
-            <input type="date" id="comparisonPeriodEnd" required />
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>3. Thresholds</legend>
-        <div class="field-row">
-          <label for="spendThreshold">Spend threshold ($)</label>
-          <input type="number" id="spendThreshold" min="0" step="1" value="300" />
-        </div>
-      </fieldset>
-
-      <fieldset>
-        <legend>4. Audit context</legend>
-
-        <label class="checkbox-row">
-          <input type="checkbox" id="fillExampleContext" />
-          Example context
-        </label>
-
-        <div class="field-row">
-          <label for="primaryObjective">Primary objective</label>
-          <textarea id="primaryObjective" rows="2"></textarea>
-        </div>
-        <div class="field-row">
-          <label for="productFocus">Product focus</label>
-          <textarea id="productFocus" rows="2"></textarea>
-        </div>
-        <div class="field-row">
-          <label for="challengeThemes">Challenge themes</label>
-          <textarea id="challengeThemes" rows="2"></textarea>
-        </div>
-        <div class="field-row">
-          <label for="clientPainPoints">Client pain points</label>
-          <textarea id="clientPainPoints" rows="2"></textarea>
-        </div>
-        <div class="field-row">
-          <label for="additionalContext">Additional context</label>
-          <textarea id="additionalContext" rows="2"></textarea>
-        </div>
-      </fieldset>
-
-      <button type="submit" id="submitBtn">Run audit</button>
-    </form>
-
-    <div id="status" class="status"></div>
-    <pre id="output" class="output"></pre>
-  </main>
+      <div class="deck-footer">
+        <button type="button" id="downloadBtn" class="download-btn" disabled>Download PPTX</button>
+      </div>
+    </div>
+  </div>
 
   <script src="bundle.js"></script>
 </body>
