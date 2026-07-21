@@ -4,3 +4,4 @@ dist
 public/bundle.js
 .venv
 generated/
+.DS_Store
