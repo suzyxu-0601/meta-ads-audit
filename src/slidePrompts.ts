@@ -12,7 +12,11 @@ language.
 
 Respond with brief analysis in plain text first, then end your response with exactly one fenced code
 block labeled json containing the structured content for this slide, matching the shape described in
-the user message. Do not write anything after the closing code fence.`;
+the user message. Do not write anything after the closing code fence.
+
+Every field in that JSON must contain real, finished content — never a filler word like "placeholder",
+"TBD", "TODO", or "N/A", and never a shortened stand-in you meant to expand later. If you're unsure what
+to write for a field, still ground it in the data you were given rather than leaving it generic.`;
 
 export const SLIDE_DEFINITIONS: SlideDefinition[] = [
   {

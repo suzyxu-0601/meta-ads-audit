@@ -10,7 +10,7 @@ Later for PPTX buid:
 - All text as editable native PowerPoint text boxes
 - All body text size must be at least 10pt
 - Titles/subtitles must be distinguishable from background color (e.g., no dark text and dark background at the same time)
-- For any charts requiring dual axes: render as matplotlib PNG images embedded in the slide rather than native PowerPoint combo charts — this ensures both series display correctly when opened in PowerPoint
+- For any charts requiring dual axes: render as PNG images embedded in the slide rather than native PowerPoint combo charts — this ensures both series display correctly when opened in PowerPoint
 
 
 Slide 1: Performance Overview 
@@ -18,7 +18,7 @@ Slide 1: Performance Overview
 Prompt: 
 Generate a performance overview slide. 
 - KPI summary strip with 5 headline numbers: total spend, peak ROAS (and month), current ROAS, CPM change (first to last month), CPA change (first to last month)
-- Three graphs (use matplotlib to generate png images) highlight lines/bars if needed 1. spend per month (bar charts, show axis on the left, don’t label individual bars) 2. line graph with dual axes showing ROAS and CPA 3. line graph with dual axes showing cpm and frequency
+- Three graphs (render as png images) highlight lines/bars if needed 1. spend per month (bar charts, show axis on the left, don’t label individual bars) 2. line graph with dual axes showing ROAS and CPA 3. line graph with dual axes showing cpm and frequency
 - 3 insight bullets grounded in the data trends
 - 3 recommendation bullets that directly address the trends
 

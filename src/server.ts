@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runCampaignAudit } from "./facebookApi.js";
 import type { AuditRequest, AuditResponse } from "./types.js";
-import { createJob, subscribeToJob, cancelJob, getJob } from "./jobManager.js";
+import { createJob, subscribeToJob, cancelJob, getJob, markDownloaded } from "./jobManager.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -69,6 +69,7 @@ app.get("/api/deck/:jobId/pptx", (req, res) => {
     res.status(404).json({ error: "Deck not ready" });
     return;
   }
+  markDownloaded(req.params.jobId);
   res.download(job.pptxPath, "GR0-Audit-Deck.pptx");
 });
 

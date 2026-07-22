@@ -60,12 +60,43 @@ function sanitizeJsonControlChars(raw: string): string {
   return result;
 }
 
+const PLACEHOLDER_PATTERN = /\b(placeholder|lorem ipsum|to be determined|N\/A)\b|\bTBD\b|\bTODO\b/i;
+
+/** Recursively scans every string value for lazy filler text Claude sometimes slips in. */
+function findPlaceholderText(value: unknown, path = ""): string | null {
+  if (typeof value === "string") {
+    return PLACEHOLDER_PATTERN.test(value) ? `${path || "value"}: "${value}"` : null;
+  }
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      const found = findPlaceholderText(value[i], `${path}[${i}]`);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (value && typeof value === "object") {
+    for (const [key, v] of Object.entries(value)) {
+      const found = findPlaceholderText(v, path ? `${path}.${key}` : key);
+      if (found) return found;
+    }
+    return null;
+  }
+  return null;
+}
+
 function extractJson(finalText: string): any {
   const jsonMatch = finalText.match(/```json\s*([\s\S]*?)```/i);
   if (!jsonMatch) {
     throw new Error("Claude response did not include a ```json code block");
   }
-  return JSON.parse(sanitizeJsonControlChars(jsonMatch[1]));
+  const parsed = JSON.parse(sanitizeJsonControlChars(jsonMatch[1]));
+
+  const placeholderHit = findPlaceholderText(parsed);
+  if (placeholderHit) {
+    throw new Error(`Response contained filler text instead of real content (${placeholderHit})`);
+  }
+
+  return parsed;
 }
 
 async function runOnce(params: {
@@ -103,9 +134,9 @@ export async function generateSlideJson(params: {
   try {
     return await runOnce(params);
   } catch (err) {
-    if (params.signal.aborted) throw err; // cancellation, not a parse failure — don't retry
+    if (params.signal.aborted) throw err; // cancellation, not a content failure — don't retry
     params.onText(
-      `\n[Response wasn't valid JSON (${
+      `\n[Response failed validation (${
         err instanceof Error ? err.message : String(err)
       }) — retrying this slide once...]\n`
     );
