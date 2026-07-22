@@ -1,0 +1,8 @@
+Inter (Inter-Regular.ttf, Inter-Bold.ttf)
+Copyright (c) The Inter Project Authors (https://github.com/rsms/inter)
+
+Licensed under the SIL Open Font License, Version 1.1.
+Full license text: https://openfontlicense.org
+
+Bundled with this app so chart rendering (chartjs-node-canvas) doesn't depend
+on fonts being pre-installed on the deployment host.

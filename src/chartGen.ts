@@ -2,6 +2,7 @@ import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import type { ChartConfiguration } from "chart.js/auto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { MonthlyAggregate } from "./monthlyAggregate.js";
 
 export interface ChartPaths {
@@ -9,6 +10,10 @@ export interface ChartPaths {
   roasCpa: string;
   cpmFreq: string;
 }
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const FONTS_DIR = path.join(__dirname, "..", "assets", "fonts");
+const CHART_FONT_FAMILY = "ChartFont";
 
 // Same pixel size as the old matplotlib figures (6.2in x 3.4in @ 200dpi).
 const WIDTH = 1240;
@@ -22,9 +27,9 @@ const GRID_COLOR_SOFT = "rgba(58, 66, 96, 0.5)";
 const GRID_COLOR_SOFTER = "rgba(58, 66, 96, 0.4)";
 
 // Base tick font was 15px — 3x larger and bold, per request.
-const TICK_FONT = { size: 45, weight: "bold" as const };
+const TICK_FONT = { size: 45, weight: "bold" as const, family: CHART_FONT_FAMILY };
 // Base axis title font was 15px — 4x larger, per request.
-const TITLE_FONT = { size: 60 };
+const TITLE_FONT = { size: 60, family: CHART_FONT_FAMILY };
 const MAX_Y_TICKS = 6;
 // Base line width was 2.2 — 3x thicker for the two dual-axis charts.
 const DUAL_AXIS_LINE_WIDTH = 6.6;
@@ -34,9 +39,22 @@ const chartJSNodeCanvas = new ChartJSNodeCanvas({
   height: HEIGHT,
   backgroundColour: "transparent",
   chartCallback: (ChartJS) => {
-    ChartJS.defaults.font.family = "Arial, Helvetica, sans-serif";
+    ChartJS.defaults.font.family = CHART_FONT_FAMILY;
     ChartJS.defaults.font.size = 15;
   },
+});
+
+// Bundle our own font rather than relying on "Arial"/"Helvetica" being
+// installed on the host — deployment hosts (e.g. a bare Railway/Docker Linux
+// container) typically ship with zero fonts, which makes node-canvas render
+// every label as an empty glyph box instead of throwing a clear error.
+chartJSNodeCanvas.registerFont(path.join(FONTS_DIR, "Inter-Regular.ttf"), {
+  family: CHART_FONT_FAMILY,
+  weight: "normal",
+});
+chartJSNodeCanvas.registerFont(path.join(FONTS_DIR, "Inter-Bold.ttf"), {
+  family: CHART_FONT_FAMILY,
+  weight: "bold",
 });
 
 function moneyLabel(value: number): string {
