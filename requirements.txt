@@ -1,0 +1,5 @@
+matplotlib==3.9.4
+pandas
+json
+sys 
+pillow==11.3.0
