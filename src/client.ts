@@ -173,6 +173,12 @@ $<HTMLFormElement>("auditForm").addEventListener("submit", async (e) => {
     });
     const data = await res.json();
 
+    if (res.status === 401) {
+      showLoginOverlay();
+      status.textContent = "Your session expired — please sign in again.";
+      return;
+    }
+
     if (!res.ok) {
       status.textContent = `Error: ${data.error ?? res.statusText}`;
       jsonStatus.hidden = true;
@@ -495,6 +501,11 @@ async function startDeckGeneration(insights: unknown) {
       body: JSON.stringify({ insights }),
     });
     const data = await res.json();
+    if (res.status === 401) {
+      exitGeneratingMode();
+      showLoginOverlay();
+      return;
+    }
     if (!res.ok) {
       appendLog(`Error starting deck generation: ${data.error ?? res.statusText}\n`);
       return;
@@ -568,3 +579,145 @@ $<HTMLButtonElement>("discontinueBtn").addEventListener("click", async () => {
   }
   exitGeneratingMode();
 });
+
+// ---------------------------------------------------------------------------
+// Auth: Google sign-in restricted to @gr0.com, session persisted via an
+// httpOnly cookie (24h expiry, enforced server-side).
+// ---------------------------------------------------------------------------
+
+interface AuthUser {
+  email: string;
+  name: string;
+  picture: string;
+}
+
+function loadGoogleScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if ((window as any).google?.accounts?.id) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Failed to load Google Sign-In"));
+    document.head.appendChild(script);
+  });
+}
+
+function showLoginError(message: string) {
+  const errorEl = $<HTMLDivElement>("loginError");
+  errorEl.textContent = message;
+  errorEl.hidden = false;
+}
+
+function showLoginOverlay() {
+  $<HTMLDivElement>("userTile").hidden = true;
+  // .login-overlay sets display:flex in CSS, which always beats the browser's
+  // default [hidden]{display:none} rule (normal author styles win over normal
+  // user-agent styles regardless of specificity) — so toggling .hidden alone
+  // never actually hides it. Use an inline style instead, which outranks both.
+  $<HTMLDivElement>("loginOverlay").style.removeProperty("display");
+}
+
+function hideLoginOverlay() {
+  $<HTMLDivElement>("loginOverlay").style.display = "none";
+}
+
+function showUserTile(user: AuthUser) {
+  $<HTMLImageElement>("userAvatar").src = user.picture;
+  $<HTMLSpanElement>("userName").textContent = user.name;
+  $<HTMLDivElement>("userEmail").textContent = user.email;
+  $<HTMLDivElement>("userTile").hidden = false;
+}
+
+async function handleCredentialResponse(response: { credential: string }) {
+  console.log("[auth] Google callback fired, exchanging credential with server...");
+  $<HTMLDivElement>("loginError").hidden = true;
+  try {
+    const res = await fetch("/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: response.credential }),
+    });
+    const data = await res.json();
+    console.log("[auth] /api/auth/google responded", res.status, data);
+    if (!res.ok) {
+      showLoginError(data.error ?? "Sign-in failed.");
+      return;
+    }
+    showUserTile(data);
+    hideLoginOverlay();
+  } catch (err) {
+    console.error("[auth] /api/auth/google request failed", err);
+    showLoginError(err instanceof Error ? err.message : String(err));
+  }
+}
+
+async function initAuth() {
+  console.log("[auth] initAuth starting");
+  try {
+    const meRes = await fetch("/api/auth/me");
+    console.log("[auth] /api/auth/me responded", meRes.status);
+    if (meRes.ok) {
+      showUserTile(await meRes.json());
+      hideLoginOverlay();
+      return;
+    }
+  } catch (err) {
+    console.error("[auth] /api/auth/me request failed", err);
+    // fall through to rendering the sign-in button
+  }
+
+  try {
+    const configRes = await fetch("/api/auth/config");
+    const config = await configRes.json();
+    if (!config.googleClientId) {
+      showLoginError("Google sign-in isn't configured yet (missing GOOGLE_CLIENT_ID in .env).");
+      return;
+    }
+
+    await loadGoogleScript();
+    console.log("[auth] Google Identity Services script loaded");
+    const google = (window as any).google;
+    google.accounts.id.initialize({
+      client_id: config.googleClientId,
+      callback: handleCredentialResponse,
+      hosted_domain: "gr0.com",
+      ux_mode: "popup",
+      error_callback: (err: unknown) => {
+        console.error("[auth] Google Identity Services error_callback", err);
+        showLoginError("Google sign-in reported an error — check the browser console for details.");
+      },
+    });
+    google.accounts.id.renderButton(document.getElementById("googleSignInButton"), {
+      theme: "outline",
+      size: "large",
+      width: 300,
+    });
+    console.log("[auth] Sign-in button rendered");
+  } catch (err) {
+    console.error("[auth] Failed to initialize Google Sign-In", err);
+    showLoginError(err instanceof Error ? err.message : String(err));
+  }
+}
+
+$<HTMLDivElement>("userTile").addEventListener("click", (e) => {
+  e.stopPropagation();
+  const menu = $<HTMLDivElement>("userMenu");
+  menu.hidden = !menu.hidden;
+});
+
+document.addEventListener("click", () => {
+  $<HTMLDivElement>("userMenu").hidden = true;
+});
+
+$<HTMLButtonElement>("logoutBtn").addEventListener("click", async (e) => {
+  e.stopPropagation();
+  await fetch("/api/auth/logout", { method: "POST" });
+  window.location.reload();
+});
+
+initAuth();

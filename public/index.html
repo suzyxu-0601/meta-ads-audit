@@ -7,9 +7,29 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+      <img src="/assets/GR0_Logo_white.png" alt="GR0" class="login-logo" />
+      <h2>Meta Ads Campaign Audit</h2>
+      <p class="login-subtitle">Sign in with your @gr0.com Google account to continue.</p>
+      <div id="googleSignInButton"></div>
+      <div id="loginError" class="login-error" hidden></div>
+    </div>
+  </div>
+
   <div class="workspace" id="workspace">
     <div class="menu-pane" id="menuPane">
       <a href="https://gr0.com/" target="_blank"><img src="/assets/GR0_Logo_white.png" alt="GR0" class="menu-logo"/></a>
+
+      <div id="userTile" class="user-tile" hidden>
+        <img id="userAvatar" class="user-avatar" alt="" />
+        <span id="userName" class="user-name"></span>
+        <div id="userMenu" class="user-menu" hidden>
+          <div class="user-menu-email" id="userEmail"></div>
+          <button type="button" id="logoutBtn" class="logout-btn">Log out</button>
+        </div>
+      </div>
+
       <main class="container">
         <h1>Meta Ads Campaign Audit</h1>
         <p class="subtitle">Pull campaign performance insights from the Meta Marketing API for a client audit.</p>
