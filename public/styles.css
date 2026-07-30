@@ -194,6 +194,24 @@ legend {
   color: #cfd3da;
 }
 
+.account-fieldset {
+  position: relative;
+}
+
+.refresh-accounts-btn {
+  position: absolute;
+  top: 0.85rem;
+  right: 1.1rem;
+  width: auto;
+  background: #0163c3;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.8rem;
+}
+
+.refresh-accounts-btn:hover:not(:disabled) {
+  background: #0177e6;
+}
+
 .radio-row {
   display: flex;
   gap: 1.5rem;

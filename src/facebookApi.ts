@@ -63,6 +63,31 @@ function simplifyCampaignRow(row: any, opts: { includeDates?: boolean } = {}): C
   return simplified;
 }
 
+export interface AdAccountSummary {
+  id: string;
+  name: string;
+}
+
+export async function fetchAdAccounts(token: string): Promise<AdAccountSummary[]> {
+  const params = new URLSearchParams({
+    access_token: token,
+    fields: "account_id,name",
+    limit: "500",
+  });
+
+  const res = await fetch(`${GRAPH_API_BASE}/me/adaccounts?${params.toString()}`);
+  const body = await res.json();
+
+  if (!res.ok) {
+    const message =
+      (body as any)?.error?.message ?? `Facebook API request failed with status ${res.status}`;
+    throw new Error(message);
+  }
+
+  const rows: any[] = (body as any).data ?? [];
+  return rows.map((row) => ({ id: row.account_id, name: row.name }));
+}
+
 interface DateRange {
   since: string;
   until: string;

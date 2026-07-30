@@ -119,6 +119,52 @@ document.querySelectorAll('input[name="accountMode"]').forEach((el) => {
 });
 toggleAccountInputs();
 
+interface AdAccountSummary {
+  id: string;
+  name: string;
+}
+
+function populateAccountOptions(accounts: AdAccountSummary[]) {
+  if (!accounts.length) return;
+  const select = $<HTMLSelectElement>("accountSelect");
+  const previousValue = select.value;
+  select.innerHTML = "";
+  for (const account of accounts) {
+    const option = document.createElement("option");
+    option.value = account.id;
+    option.textContent = account.name;
+    select.appendChild(option);
+  }
+  if (accounts.some((a) => a.id === previousValue)) {
+    select.value = previousValue;
+  }
+}
+
+async function loadAdAccounts(notifyOnError = false) {
+  const btn = $<HTMLButtonElement>("refreshAccountsBtn");
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Refreshing…";
+  try {
+    const res = await fetch("/api/adaccounts");
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? `Request failed with status ${res.status}`);
+    }
+    populateAccountOptions(data.accounts ?? []);
+  } catch (err) {
+    console.error("[accounts] Failed to load ad accounts", err);
+    if (notifyOnError) {
+      alert(`Could not refresh accounts: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+}
+
+$<HTMLButtonElement>("refreshAccountsBtn").addEventListener("click", () => loadAdAccounts(true));
+
 $<HTMLAnchorElement>("showMoreLink").addEventListener("click", (e) => {
   e.preventDefault();
   const output = $<HTMLPreElement>("output");
@@ -650,6 +696,7 @@ async function handleCredentialResponse(response: { credential: string }) {
     }
     showUserTile(data);
     hideLoginOverlay();
+    loadAdAccounts();
   } catch (err) {
     console.error("[auth] /api/auth/google request failed", err);
     showLoginError(err instanceof Error ? err.message : String(err));
@@ -664,6 +711,7 @@ async function initAuth() {
     if (meRes.ok) {
       showUserTile(await meRes.json());
       hideLoginOverlay();
+      loadAdAccounts();
       return;
     }
   } catch (err) {

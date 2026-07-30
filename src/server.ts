@@ -3,7 +3,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { runCampaignAudit } from "./facebookApi.js";
+import { runCampaignAudit, fetchAdAccounts } from "./facebookApi.js";
 import type { AuditRequest, AuditResponse } from "./types.js";
 import { createJob, subscribeToJob, cancelJob, getJob, markDownloaded } from "./jobManager.js";
 import { verifyGoogleToken, createSession, getSession, destroySession } from "./auth.js";
@@ -81,6 +81,21 @@ function requireAuth(req: express.Request, res: express.Response, next: express.
 
 app.use("/api/insights", requireAuth);
 app.use("/api/deck", requireAuth);
+app.use("/api/adaccounts", requireAuth);
+
+app.get("/api/adaccounts", async (req, res) => {
+  if (!TOKEN) {
+    res.status(500).json({ error: "META_SYSTEM_USER_TOKEN is not set in .env" });
+    return;
+  }
+
+  try {
+    const accounts = await fetchAdAccounts(TOKEN);
+    res.json({ accounts });
+  } catch (err) {
+    res.status(502).json({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
 
 app.post("/api/insights", async (req, res) => {
   if (!TOKEN) {
